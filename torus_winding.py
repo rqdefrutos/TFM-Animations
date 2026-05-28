@@ -58,13 +58,14 @@ def torus_winding(frequencies, initial_points, period=2*np.pi, R=2.0, r=1.0):
 
     plt.show()
 
-def winding_animation(frequencies, initial_points, period=2*np.pi, R=2.0, r=1.0):
+def winding_animation(frequencies, initial_points, period=2*np.pi, speed=1, R=2.0, r=1.0):
     # Displays animation of a winding of the torus
     # Use period=100 for irrational q1/q2
 
     fig, ax = plot_torus_surface(R, r)
 
-    t = np.linspace(0, period, 2000)
+    num_nodes = int(50 * period)
+    t = np.linspace(0, period, num_nodes)
     phi = frequencies * t[:, None] + initial_points
     x, y, z = parametrize_torus(phi[:, 0], phi[:, 1], R, r)
 
@@ -72,9 +73,8 @@ def winding_animation(frequencies, initial_points, period=2*np.pi, R=2.0, r=1.0)
     trail, = ax.plot3D([], [], [], "r-")
 
     def update(i):
-        idx = i * 5
-        point.set_data_3d([x[idx]], [y[idx]], [z[idx]])
-        trail.set_data_3d(x[:idx], y[:idx], z[:idx])
+        point.set_data_3d([x[i]], [y[i]], [z[i]])
+        trail.set_data_3d(x[:i], y[:i], z[:i])
         return point, trail
 
     ax.set_aspect("equal")
@@ -82,10 +82,9 @@ def winding_animation(frequencies, initial_points, period=2*np.pi, R=2.0, r=1.0)
     ax.set_yticklabels([])
     ax.set_zticklabels([])
 
-    anim = FuncAnimation(fig, update, frames=300, interval=50, blit=True)
-    plt.show()
+    frames = num_nodes
+    interval = 500 * period / (speed * frames)
+    anim = FuncAnimation(fig, update, frames=frames, interval=interval, blit=True)
+    #plt.show()
 
     return anim
-
-# torus_anim: winding_animation([1.0, np.sqrt(2)], [0, 0], period=100)
-winding_animation([1, 3], [0, 0])
